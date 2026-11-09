@@ -1,0 +1,310 @@
+<meta name="dash-one-writer">
+<style>
+.ed{font-family:var(--font-anthropic-sans);color:var(--color-fg);display:flex;flex-direction:column;gap:var(--cds-gap-xl)}
+.ed h1{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0}
+.ed h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0 0 var(--cds-gap-xs)}
+.ed .lede{font-size:var(--cds-font-size-body);margin:var(--cds-gap-sm) 0 0;max-width:60em}
+.ed .muted{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+.ed .warn{border-left:3px solid var(--color-warn);padding:var(--cds-pad-sm) var(--cds-pad-md);background:var(--color-panel);font-size:var(--cds-font-size-body)}
+.ed .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--cds-gap-md)}
+.ed .tile{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg)}
+.ed .tile .k{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+.ed .tile .v{font-family:var(--font-anthropic-serif);font-weight:400;font-size:28px;font-variant-numeric:tabular-nums;margin-top:4px}
+.ed .card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);position:relative}
+.ed .chart{min-height:260px;position:relative}
+.ed .row{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);align-items:center;justify-content:space-between}
+.ed .tblwrap{overflow-x:auto}
+.ed table{border-collapse:collapse;width:100%;font-size:var(--cds-font-size-body);font-variant-numeric:tabular-nums}
+.ed th,.ed td{padding:6px 10px;border-bottom:1px solid var(--color-border-line);text-align:right;white-space:nowrap}
+.ed th:first-child,.ed td:first-child,.ed th.l,.ed td.l{text-align:left}
+.ed th{color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium);font-size:var(--cds-font-size-caption)}
+.ed .pos{color:var(--color-ok)}.ed .neg{color:var(--color-bad)}
+.ed .tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);box-shadow:var(--cds-shadow-popover);border-radius:var(--cds-radius);padding:6px 9px;font-size:var(--cds-font-size-caption);white-space:nowrap;z-index:5}
+.ed .axis text{fill:var(--cds-text-secondary);font-size:var(--cds-font-size-caption)}
+.ed .axis path,.ed .axis line{stroke:var(--cds-chart-axis)}
+.ed .grid line{stroke:var(--cds-chart-grid)}.ed .grid path{display:none}
+.ed .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--cds-gap-md)}
+.ed .legend{display:flex;gap:var(--cds-gap-md);flex-wrap:wrap;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.ed .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+[data-dash-source-state=refreshing]{opacity:.5}
+</style>
+
+<div class="ed">
+<header id="top">
+  <h1>9/15 EMA Indicator: Startup Dashboard</h1>
+  <p class="lede">Across 16 index-and-timeframe runs, the indicator took <b data-draw="t-trades" data-source="totals" data-field="trades" data-row="0">—</b> trades and won <b data-draw="t-rate" data-source="totals" data-field="win_rate" data-row="0">—</b> of them. <b data-draw="best-run" data-source="best" data-field="run" data-row="0">—</b> made <b data-draw="best-pnl" data-source="best" data-field="net_pnl" data-row="0">—</b> of the <b data-draw="t-pnl" data-source="totals" data-field="net_pnl" data-row="0">—</b> combined net profit, so the result rests on one run.</p>
+  <p class="muted">Each run starts with ₹20,000 and trades one ATM weekly option lot at a time. Option premiums are modelled estimates. Sales figures are projections: no subscriptions have been sold yet.</p>
+</header>
+
+<div class="warn" id="caveat">Treat these backtest numbers as a hypothesis to forward-test, not as proof. Do not advertise them as returns: SEBI restricts performance claims, and selling buy/sell signals may need Research Analyst registration.</div>
+
+<section id="indicator">
+  <h2>Indicator results</h2>
+  <div class="tiles">
+    <div class="tile" id="tile-trades"><div class="k">Total trades</div><div class="v" data-draw="k-trades" data-source="totals" data-field="trades" data-row="0">—</div></div>
+    <div class="tile" id="tile-wins"><div class="k">Wins</div><div class="v" data-draw="k-wins" data-source="totals" data-field="wins" data-row="0">—</div></div>
+    <div class="tile" id="tile-rate"><div class="k">Win rate</div><div class="v" data-draw="k-rate" data-source="totals" data-field="win_rate" data-row="0">—</div></div>
+    <div class="tile" id="tile-pnl"><div class="k">Combined net P&amp;L (all runs)</div><div class="v" data-draw="k-pnl" data-source="totals" data-field="net_pnl" data-row="0">—</div></div>
+  </div>
+</section>
+
+<section class="card" id="pnl-by-run">
+  <h2>Net P&amp;L by run, from ₹20,000</h2>
+  <p class="muted">Green made money, red lost it. Runs with no trades show zero.</p>
+  <div class="chart" data-draw="bars" data-source="runs"></div>
+</section>
+
+<section class="card" id="equity">
+  <div class="row"><h2>Equity curve</h2><select class="dash-select" aria-label="Run" data-draw="run-pick" data-source="runs"></select></div>
+  <p class="muted">Capital after each trade, starting at ₹20,000.</p>
+  <div class="chart" data-draw="curve" data-source="trades"></div>
+</section>
+
+<section class="card" id="runs-table">
+  <h2>Every run</h2>
+  <div class="tblwrap">
+  <table data-source="runs" data-row-key="run">
+    <thead><tr><th data-field="run">Run</th><th class="l" data-field="window">Data window</th><th data-field="trades">Trades</th><th data-field="wins">Wins</th><th data-field="net_pnl">Net P&amp;L (₹)</th><th data-field="ending_capital">Ending capital (₹)</th><th data-field="max_drawdown">Max drawdown (₹)</th></tr></thead>
+    <tbody data-draw="runs-body"></tbody>
+  </table>
+  </div>
+</section>
+
+<section id="business">
+  <h2>Pricing</h2>
+  <p class="muted">Priced low because the evidence is thin: ₹799 is about 4% of a ₹20,000 account a month. Raise it only after about six months of live, timestamped results.</p>
+  <div class="plans" data-draw="plans" data-source="pricing"></div>
+</section>
+
+<section id="projection-tiles">
+  <h2>12-month sales projection, base case</h2>
+  <p class="muted">Assumes 15 new subscribers a month, 12% monthly churn, ₹300 to acquire each and ₹8,000 fixed cost a month.</p>
+  <div class="tiles">
+    <div class="tile"><div class="k">Subscribers in month 12</div><div class="v" data-draw="p-subs" data-source="proj_totals" data-field="m12_subscribers" data-where="scenario=Base">—</div></div>
+    <div class="tile"><div class="k">12-month revenue (ex GST)</div><div class="v" data-draw="p-rev" data-source="proj_totals" data-field="revenue_12m" data-where="scenario=Base">—</div></div>
+    <div class="tile"><div class="k">12-month net profit</div><div class="v" data-draw="p-prof" data-source="proj_totals" data-field="profit_12m" data-where="scenario=Base">—</div></div>
+  </div>
+</section>
+
+<section class="card" id="projection">
+  <div class="row"><h2>Projection by scenario</h2>
+    <select class="dash-select" aria-label="Measure" id="measure"><option value="revenue_ex_gst">Monthly revenue (ex GST)</option><option value="subscribers">Subscribers</option><option value="net_profit">Monthly net profit</option></select></div>
+  <div class="legend" data-draw="proj-legend"></div>
+  <div class="chart" data-draw="proj" data-source="projection"></div>
+  <div class="tblwrap">
+  <table data-source="proj_totals" data-row-key="scenario">
+    <thead><tr><th data-field="scenario">Scenario</th><th data-field="m12_subscribers">Subscribers, M12</th><th data-field="revenue_12m">12-mo revenue (₹)</th><th data-field="profit_12m">12-mo net profit (₹)</th></tr></thead>
+    <tbody data-draw="proj-body"></tbody>
+  </table>
+  </div>
+</section>
+
+<details id="notes"><summary>How these numbers were made</summary>
+<p class="muted">Rules come from the 9 &amp; 15 EMA scalping video: EMAs stacked and sloped at 30° or more, a pin bar, full-body or engulfing candle off the EMAs, stop at the signal candle, target at 1:2. Intraday 1m and 3m runs cover about 7 sessions, 5m to 30m about 60 days, and 1H and above about 2 years of Yahoo data. Option P&amp;L uses estimated premiums and includes costs. Nifty uses a 65-unit lot and Sensex a 20-unit lot. All figures come from your EMA_Indicator_Backtest_Dashboard workbook.</p>
+</details>
+</div>
+
+<script>
+const N = v => (v === null || v === '' || v === undefined) ? 0 : +v;
+const inr = v => (v < 0 ? '−₹' : '₹') + d3.format(',.0f')(Math.abs(v));
+const pct = d3.format('.0%');
+window.edN = N; window.edInr = inr;
+
+dash.calc('totals', {inputs: ['runs'], title: 'Totals across all runs', description: 'Trades, wins, win rate and net P&L summed over every run.',
+  fn: (runs) => {
+    const trades = d3.sum(runs, r => +r.trades), wins = d3.sum(runs, r => +r.wins);
+    return [{trades, wins, win_rate: trades ? wins / trades : 0, net_pnl: Math.round(d3.sum(runs, r => +r.net_pnl) * 100) / 100}];
+  }});
+dash.calc('best', {inputs: ['runs'], title: 'Best run', description: 'The run with the highest net P&L.',
+  fn: (runs) => {
+    const b = d3.greatest(runs, r => +r.net_pnl);
+    return b ? [{run: b.run, net_pnl: +b.net_pnl}] : [];
+  }});
+dash.calc('proj_totals', {inputs: ['projection'], title: 'Projection totals by scenario', description: 'Month-12 subscribers and 12-month revenue and profit for each scenario.',
+  fn: (projection) => ['Conservative', 'Base', 'Optimistic'].map(s => {
+    const rows = projection.filter(r => r.scenario === s);
+    const m12 = rows.find(r => +r.month === 12);
+    return {scenario: s, m12_subscribers: m12 ? Math.round(+m12.subscribers) : 0,
+      revenue_12m: d3.sum(rows, r => +r.revenue_ex_gst), profit_12m: d3.sum(rows, r => +r.net_profit)};
+  })});
+
+function val(id, field, pick, fmt) {
+  return el => {
+    const d = dash.data(id);
+    if (d.status !== 'ok' || !d.data || !d.data.length) { el.textContent = '—'; return; }
+    const row = pick ? d.data.find(pick) : d.data[0];
+    if (!row) { el.textContent = '—'; return; }
+    el.textContent = fmt(row[field]);
+    el.classList.toggle('neg', field.includes('pnl') || field.includes('profit') ? +row[field] < 0 : false);
+  };
+}
+dash.draw('t-trades', val('totals', 'trades', null, d3.format(',')));
+dash.draw('k-trades', val('totals', 'trades', null, d3.format(',')));
+dash.draw('k-wins', val('totals', 'wins', null, d3.format(',')));
+dash.draw('t-rate', val('totals', 'win_rate', null, pct));
+dash.draw('k-rate', val('totals', 'win_rate', null, pct));
+dash.draw('t-pnl', val('totals', 'net_pnl', null, inr));
+dash.draw('k-pnl', val('totals', 'net_pnl', null, inr));
+dash.draw('best-run', val('best', 'run', null, String));
+dash.draw('best-pnl', val('best', 'net_pnl', null, inr));
+const base = r => r.scenario === 'Base';
+dash.draw('p-subs', val('proj_totals', 'm12_subscribers', base, d3.format(',')));
+dash.draw('p-rev', val('proj_totals', 'revenue_12m', base, inr));
+dash.draw('p-prof', val('proj_totals', 'profit_12m', base, inr));
+
+function tipper(box) {
+  let t = box.querySelector('.tip');
+  if (!t) { t = document.createElement('div'); t.className = 'tip'; t.hidden = true; box.appendChild(t); }
+  return {show(lines, x, y) {
+    t.replaceChildren(...lines.map((s, i) => { const d = document.createElement('div'); d.textContent = s; if (i === 0) d.style.fontWeight = 600; return d; }));
+    t.hidden = false;
+    const w = box.clientWidth, tw = t.offsetWidth;
+    t.style.left = Math.max(0, Math.min(w - tw, x + 12)) + 'px'; t.style.top = Math.max(0, y - 10) + 'px';
+  }, hide() { t.hidden = true; }};
+}
+function failed(el, st) {
+  el.replaceChildren();
+  const p = document.createElement('p'); p.className = 'muted';
+  p.textContent = st === 'error' ? 'Failed to load' : '—'; el.appendChild(p);
+}
+
+dash.draw('bars', el => {
+  const d = dash.data('runs');
+  if (d.status !== 'ok') return failed(el, d.status);
+  const rows = d.data.map(r => ({run: r.run, v: +r.net_pnl, trades: +r.trades, wins: +r.wins})).sort((a, b) => b.v - a.v);
+  el.replaceChildren();
+  const W = el.clientWidth || 600, bh = 22, H = rows.length * bh + 30;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('role', 'img').attr('aria-label', 'Bar chart of net profit or loss for each run');
+  const probe = svg.append('text').attr('class', 'axis').style('font-size', 'var(--cds-font-size-caption)');
+  let lw = 0; rows.forEach(r => { probe.text(r.run); lw = Math.max(lw, probe.node().getComputedTextLength()); }); probe.remove();
+  const m = {l: lw + 14, r: 60, t: 4, b: 24};
+  const x = d3.scaleLinear().domain(d3.extent([0, ...rows.map(r => r.v)])).nice().range([m.l, W - m.r]);
+  const y = d3.scaleBand().domain(rows.map(r => r.run)).range([m.t, H - m.b]).padding(0.25);
+  svg.append('g').attr('class', 'grid').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(W / 120))).tickSize(-(H - m.b - m.t)).tickFormat(''));
+  svg.append('g').attr('class', 'axis').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(W / 120))).tickFormat(v => d3.format('~s')(v)));
+  svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', m.t).attr('y2', H - m.b).style('stroke', 'var(--cds-chart-reference)');
+  const tip = tipper(el);
+  const g = svg.append('g').selectAll('g').data(rows).join('g');
+  g.append('rect').attr('x', r => Math.min(x(0), x(r.v))).attr('y', r => y(r.run)).attr('height', y.bandwidth())
+    .attr('width', r => Math.max(1, Math.abs(x(r.v) - x(0)))).attr('rx', 2)
+    .style('fill', r => r.v >= 0 ? 'var(--color-ok)' : 'var(--color-bad)')
+    .on('pointermove', (ev, r) => { const [px, py] = d3.pointer(ev, el); tip.show([r.run, 'Net P&L ' + inr(r.v), r.trades + ' trades, ' + r.wins + ' wins'], px, py); })
+    .on('pointerleave', () => tip.hide());
+  g.append('text').attr('x', m.l - 8).attr('y', r => y(r.run) + y.bandwidth() / 2).attr('dy', '0.35em').attr('text-anchor', 'end')
+    .style('fill', 'var(--color-fg)').style('font-size', 'var(--cds-font-size-caption)').text(r => r.run);
+  g.append('text').attr('x', r => r.v >= 0 ? x(r.v) + 4 : x(0) + 4).attr('y', r => y(r.run) + y.bandwidth() / 2).attr('dy', '0.35em')
+    .style('fill', 'var(--cds-text-secondary)').style('font-size', 'var(--cds-font-size-caption)').style('font-variant-numeric', 'tabular-nums')
+    .text(r => r.trades ? d3.format('~s')(r.v) : 'no trades');
+});
+
+dash.draw('run-pick', sel => {
+  const d = dash.data('runs');
+  const opts = (d.status === 'ok' ? d.data : []).filter(r => +r.trades > 0).sort((a, b) => +b.net_pnl - +a.net_pnl);
+  sel.replaceChildren(...opts.map(r => new Option(r.run, r.run)));
+  const cur = dash.params().run || (opts[0] && opts[0].run) || '';
+  sel.value = cur;
+  sel.onchange = () => dash.setParams({run: sel.value});
+});
+
+dash.draw('curve', el => {
+  const d = dash.data('trades'), rd = dash.data('runs');
+  if (d.status !== 'ok' || rd.status !== 'ok') return failed(el, d.status === 'ok' ? rd.status : d.status);
+  const withTrades = rd.data.filter(r => +r.trades > 0).sort((a, b) => +b.net_pnl - +a.net_pnl);
+  const run = dash.params().run || (withTrades[0] && withTrades[0].run);
+  const pts = [{seq: 0, equity: 20000, label: 'Start'}].concat(d.data.filter(t => t.run === run).map(t => ({seq: +t.seq, equity: +t.equity, pnl: +t.pnl, label: t.entry_time, opt: t.option, why: t.exit_reason})));
+  el.replaceChildren();
+  const W = el.clientWidth || 600, H = 260, m = {l: 56, r: 16, t: 10, b: 28};
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('role', 'img').attr('aria-label', 'Equity curve for ' + run);
+  const x = d3.scaleLinear().domain([0, d3.max(pts, p => p.seq) || 1]).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain(d3.extent(pts.map(p => p.equity).concat(20000))).nice().range([H - m.b, m.t]);
+  svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(''));
+  svg.append('g').attr('class', 'axis').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(v => d3.format('~s')(v)));
+  svg.append('g').attr('class', 'axis').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(Math.min(pts.length - 1, Math.floor(W / 60))).tickFormat(d3.format('d')));
+  svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(20000)).attr('y2', y(20000)).style('stroke', 'var(--cds-chart-reference)').style('stroke-dasharray', '4 3');
+  svg.append('path').datum(pts).attr('d', d3.line().x(p => x(p.seq)).y(p => y(p.equity)))
+    .style('fill', 'none').style('stroke', dash.colors[0]).style('stroke-width', 2);
+  const tip = tipper(el);
+  svg.append('g').selectAll('circle').data(pts).join('circle').attr('cx', p => x(p.seq)).attr('cy', p => y(p.equity)).attr('r', 4)
+    .style('fill', p => p.pnl === undefined ? 'var(--cds-chart-muted)' : p.pnl >= 0 ? 'var(--color-ok)' : 'var(--color-bad)')
+    .on('pointermove', (ev, p) => { const [px, py] = d3.pointer(ev, el);
+      tip.show(p.pnl === undefined ? ['Start', '₹20,000'] : ['Trade ' + p.seq + ' · ' + p.label, p.opt + ', ' + p.why.replace('_', ' '), 'P&L ' + inr(p.pnl), 'Capital ' + inr(p.equity)], px, py); })
+    .on('pointerleave', () => tip.hide());
+});
+
+dash.draw('runs-body', tb => {
+  const d = dash.data('runs');
+  if (d.status !== 'ok') { tb.replaceChildren(); return; }
+  const f = d3.format(',.0f');
+  tb.replaceChildren(...d.data.map(r => {
+    const tr = document.createElement('tr');
+    [[r.run], [r.window, 'l'], [r.trades], [r.wins], [f(+r.net_pnl), +r.net_pnl < 0 ? 'neg' : +r.net_pnl > 0 ? 'pos' : ''], [f(+r.ending_capital)], [f(+r.max_drawdown)]]
+      .forEach(([t, c]) => { const td = document.createElement('td'); td.textContent = t; if (c) td.className = c; tr.appendChild(td); });
+    return tr;
+  }));
+});
+
+dash.draw('plans', el => {
+  const d = dash.data('pricing');
+  if (d.status !== 'ok') return failed(el, d.status);
+  el.replaceChildren(...d.data.map((p, i) => {
+    const c = document.createElement('div'); c.className = 'tile';
+    if (p.plan === 'Quarterly') c.style.borderColor = 'var(--color-ok)';
+    const k = document.createElement('div'); k.className = 'k'; k.textContent = p.plan + (p.plan === 'Quarterly' ? ' · main plan' : '');
+    const v = document.createElement('div'); v.className = 'v'; v.textContent = inr(+p.price);
+    v.dataset.source = 'pricing'; v.dataset.field = 'price'; v.dataset.where = 'plan=' + encodeURIComponent(p.plan);
+    const s = document.createElement('div'); s.className = 'muted';
+    s.textContent = inr(+p.per_month) + ' a month' + (+p.discount ? ', ' + pct(+p.discount) + ' off monthly' : '') + '. ' + p.role + '.';
+    c.append(k, v, s); return c;
+  }));
+});
+
+const scen = ['Conservative', 'Base', 'Optimistic'];
+dash.draw('proj-legend', el => {
+  el.replaceChildren(...scen.map((s, i) => { const sp = document.createElement('span'); const sw = document.createElement('span'); sw.className = 'sw'; sw.style.background = dash.colors[i]; sp.append(sw, s); return sp; }));
+});
+dash.draw('proj', {
+  mount(el) {
+    const m = document.getElementById('measure');
+    if (m) { m.value = dash.params().measure || 'revenue_ex_gst'; m.onchange = () => { dash.setParams({measure: m.value}); }; }
+    return {};
+  },
+  update(el) {
+    const d = dash.data('projection');
+    if (d.status !== 'ok') return failed(el, d.status);
+    const key = dash.params().measure || 'revenue_ex_gst';
+    const money = key !== 'subscribers';
+    el.replaceChildren();
+    const W = el.clientWidth || 600, H = 260, m = {l: 56, r: 16, t: 10, b: 28};
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Line chart of projected ' + key.replace(/_/g, ' ') + ' by scenario over 12 months');
+    const rows = d.data.map(r => ({s: r.scenario, mo: +r.month, v: +r[key]}));
+    const x = d3.scaleLinear().domain([1, 12]).range([m.l, W - m.r]);
+    const y = d3.scaleLinear().domain(d3.extent(rows.map(r => r.v).concat(0))).nice().range([H - m.b, m.t]);
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(''));
+    svg.append('g').attr('class', 'axis').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(v => d3.format('~s')(v)));
+    svg.append('g').attr('class', 'axis').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(Math.min(12, Math.floor(W / 45))).tickFormat(v => 'M' + v));
+    if (y.domain()[0] < 0) svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(0)).attr('y2', y(0)).style('stroke', 'var(--cds-chart-reference)');
+    const tip = tipper(el);
+    scen.forEach((s, i) => {
+      const pts = rows.filter(r => r.s === s).sort((a, b) => a.mo - b.mo);
+      svg.append('path').datum(pts).attr('d', d3.line().x(p => x(p.mo)).y(p => y(p.v))).style('fill', 'none').style('stroke', dash.colors[i]).style('stroke-width', 2);
+      svg.append('g').selectAll('circle').data(pts).join('circle').attr('cx', p => x(p.mo)).attr('cy', p => y(p.v)).attr('r', 3.5).style('fill', dash.colors[i])
+        .on('pointermove', (ev, p) => { const [px, py] = d3.pointer(ev, el); tip.show([s + ', month ' + p.mo, money ? inr(p.v) : d3.format(',.0f')(p.v) + ' subscribers'], px, py); })
+        .on('pointerleave', () => tip.hide());
+    });
+  }
+});
+
+dash.draw('proj-body', tb => {
+  const d = dash.data('proj_totals');
+  if (d.status !== 'ok' || !d.data) { tb.replaceChildren(); return; }
+  const f = d3.format(',.0f');
+  tb.replaceChildren(...d.data.map(r => {
+    const tr = document.createElement('tr');
+    [[r.scenario], [f(r.m12_subscribers)], [f(r.revenue_12m)], [f(r.profit_12m), r.profit_12m < 0 ? 'neg' : 'pos']]
+      .forEach(([t, c]) => { const td = document.createElement('td'); td.textContent = t; if (c) td.className = c; tr.appendChild(td); });
+    return tr;
+  }));
+});
+</script>
